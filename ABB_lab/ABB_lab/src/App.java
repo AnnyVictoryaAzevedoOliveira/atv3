@@ -8,13 +8,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public class App {
 
-	/** Nome do arquivo de dados. O arquivo deve estar localizado na raiz do projeto */
+
     static String nomeArquivoDados;
-    
-    /** Scanner para leitura de dados do teclado */
+
     static Scanner teclado;
 
-    /** Quantidade de produtos cadastrados atualmente no vetor */
     static int quantosProdutos = 0;
 
     static ABB<String, Produto> produtosCadastradosPorNome;
@@ -26,13 +24,11 @@ public class App {
         System.out.flush();
     }
 
-    /** Gera um efeito de pausa na CLI. Espera por um enter para continuar */
     static void pausa() {
         System.out.println("Digite enter para continuar...");
         teclado.nextLine();
     }
 
-    /** Cabeçalho principal da CLI do sistema */
     static void cabecalho() {
         System.out.println("AEDs II COMÉRCIO DE COISINHAS");
         System.out.println("=============================");
@@ -52,10 +48,7 @@ public class App {
         return valor;
     }
     
-    /** 
-     * Imprime o menu principal, lê a opção do usuário e a retorna (int).
-     * @return Um inteiro com a opção do usuário.
-    */
+
     static int menu() {
         cabecalho();
         System.out.println("1 - Listar todos os produtos");
@@ -70,14 +63,6 @@ public class App {
         return lerOpcao("Digite sua opção: ", Integer.class);
     }
     
-    /**
-     * Lê os dados de um arquivo-texto e retorna uma ávore de produtos. Arquivo-texto no formato
-     * N  (quantidade de produtos) <br/>
-     * tipo;descrição;preçoDeCusto;margemDeLucro;[dataDeValidade] <br/>
-     * Deve haver uma linha para cada um dos produtos. Retorna uma árvore vazia em caso de problemas com o arquivo.
-     * @param nomeArquivoDados Nome do arquivo de dados a ser aberto.
-     * @return Uma árvore com os produtos carregados, ou vazia em caso de problemas de leitura.
-     */
     static <K> ABB<K, Produto> lerProdutos(String nomeArquivoDados, Function<Produto, K> extratorDeChave) {
     	
     	Scanner arquivo = null;
@@ -115,16 +100,13 @@ public class App {
     	return null;
     }
     
-    /** Localiza um produto na árvore de produtos organizados por id, a partir do código de produto informado pelo usuário, e o retorna. 
-     *  Em caso de não encontrar o produto, retorna null */
     static Produto localizarProdutoID(ABB<Integer, Produto> produtosCadastrados) {
         
         //TODO
     	return null;
     }
     
-    /** Localiza um produto na árvore de produtos organizados por nome, a partir do nome de produto informado pelo usuário, e o retorna. 
-     *  A busca não é sensível ao caso. Em caso de não encontrar o produto, retorna null */
+
     static Produto localizarProdutoNome(ABB<String, Produto> produtosCadastrados) {
         
     	//TODO
@@ -143,7 +125,6 @@ public class App {
         System.out.println(mensagem.toString());
     }
 
-    /** Lista todos os produtos cadastrados, numerados, um por linha */
     static <K> void listarTodosOsProdutos(ABB<K, Produto> produtosCadastrados) {
     	
         cabecalho();
@@ -151,15 +132,11 @@ public class App {
         System.out.println(produtosCadastrados.toString());
     }
     
-    /** Localiza e remove um produto da árvore de produtos organizados por id, a partir do código de produto informado pelo usuário, e o retorna. 
-     *  Em caso de não encontrar o produto, retorna null */
     static Produto removerProdutoId(ABB<Integer, Produto> produtosCadastrados) {
     	//TODO
     	return null;
     }
 
-     /** Localiza e remove um produto na árvore de produtos organizados por nome, a partir do nome de produto informado pelo usuário, e o retorna. 
-      *  A busca não é sensível ao caso. Em caso de não encontrar o produto, retorna null */
     static Produto removerProdutoNome(ABB<String, Produto> produtosCadastrados) {
     	//TODO
     	return null;
@@ -173,9 +150,23 @@ public class App {
     private static <K> void recortarProduto(ABB<K, Produto> produtosCadastrados, K deOnde, K ateOnde) {
     	//TODO
     }
-    
+
     private static void recortarProdutosNome(ABB<String, Produto> produtosCadastrados) {
-    	//TODO
+
+    	String nomeInicio, nomeFinal;
+    	Lista<Produto> recorte;
+
+    	cabecalho();
+    	System.out.println("RECORTE DE PRODUTOS, POR NOME");
+    	System.out.println("Digite o nome inicial do recorte: ");
+    	nomeInicio = teclado.nextLine().trim().toLowerCase();
+    	System.out.println("Digite o nome final do recorte: ");
+    	nomeFinal = teclado.nextLine().trim().toLowerCase();
+
+    	recorte = produtosCadastrados.recortar(nomeInicio, nomeFinal);
+
+    	System.out.println("\nPRODUTOS ENTRE \"" + nomeInicio + "\" E \"" + nomeFinal + "\":");
+    	System.out.println(recorte);
     }
      
     private static void recortarProdutosId(ABB<Integer, Produto> produtosCadastrados) {
@@ -185,7 +176,7 @@ public class App {
     public static void main(String[] args) {
 		teclado = new Scanner(System.in, Charset.forName("UTF-8"));
         nomeArquivoDados = "produtos.txt";
-        produtosCadastradosPorNome = lerProdutos(nomeArquivoDados, (p -> p.descricao));
+        produtosCadastradosPorNome = lerProdutos(nomeArquivoDados, (p -> p.descricao.toLowerCase()));
         produtosCadastradosPorId = new ABB<Integer, Produto>(produtosCadastradosPorNome, (p -> p.idProduto));
         
         int opcao = -1;
