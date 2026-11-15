@@ -2,15 +2,14 @@ import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-public class ABB<K, V> implements IMapeamento<K, V>{
+public class ABB<K, V> implements IMapeamento<K, V> {
 
-	private No<K, V> raiz;              
-	private Comparator<K> comparador;   
-	private int tamanho;                
+	private No<K, V> raiz;
+	private Comparator<K> comparador;
+	private int tamanho;
 	private long comparacoes;
 	private long inicio;
 	private long termino;
-
 
 	private void init(Comparator<K> comparador) {
 		this.raiz = null;
@@ -18,17 +17,14 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 		this.comparador = comparador;
 	}
 
-
 	@SuppressWarnings("unchecked")
 	public ABB() {
 		init((Comparator<K>) Comparator.naturalOrder());
 	}
 
-
 	public ABB(Comparator<K> comparador) {
 		init(comparador);
 	}
-
 
 	@SuppressWarnings("unchecked")
 	public ABB(ABB<?, V> original, Function<V, K> funcaoChave) {
@@ -46,11 +42,9 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 		}
 	}
 
-
 	public boolean vazia() {
 		return (this.raiz == null);
 	}
-
 
 	@Override
 	public V pesquisar(K chave) {
@@ -67,7 +61,6 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 
 		return procurado;
 	}
-
 
 	private V pesquisar(No<K, V> raizArvore, K procurado) {
 
@@ -87,7 +80,6 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 			return pesquisar(raizArvore.getDireita(), procurado);
 	}
 
-
 	@Override
 	public int inserir(K chave, V item) {
 
@@ -98,7 +90,6 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 
 		return tamanho;
 	}
-
 
 	private No<K, V> inserir(No<K, V> raizArvore, K chave, V item) {
 
@@ -122,7 +113,6 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 		return raizArvore;
 	}
 
-
 	@Override
 	public V remover(K chave) {
 
@@ -144,7 +134,6 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 		return removido;
 	}
 
-
 	private No<K, V> remover(No<K, V> raizArvore, K chaveRemover) {
 
 		int comparacao;
@@ -157,10 +146,10 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 
 		if (comparacao == 0) {
 			if (raizArvore.getDireita() == null)
-				raizArvore = raizArvore.getEsquerda();      
+				raizArvore = raizArvore.getEsquerda();
 			else if (raizArvore.getEsquerda() == null)
-				raizArvore = raizArvore.getDireita();       
-			else                                           
+				raizArvore = raizArvore.getDireita();
+			else
 				raizArvore.setEsquerda(removerNoAntecessor(raizArvore, raizArvore.getEsquerda()));
 		} else if (comparacao < 0)
 			raizArvore.setEsquerda(remover(raizArvore.getEsquerda(), chaveRemover));
@@ -169,7 +158,6 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 
 		return raizArvore;
 	}
-
 
 	private No<K, V> removerNoAntecessor(No<K, V> itemRetirar, No<K, V> raizArvore) {
 
@@ -194,7 +182,6 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 		return caminhamentoEmOrdem();
 	}
 
-
 	public String caminhamentoEmOrdem() {
 
 		StringBuilder resultado = new StringBuilder();
@@ -206,13 +193,45 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 		return resultado.toString();
 	}
 
-
 	private void caminhamentoEmOrdem(No<K, V> raizArvore, StringBuilder resultado) {
 
 		if (raizArvore != null) {
 			caminhamentoEmOrdem(raizArvore.getEsquerda(), resultado);
 			resultado.append(raizArvore.getItem()).append("\n");
 			caminhamentoEmOrdem(raizArvore.getDireita(), resultado);
+		}
+	}
+
+	public Lista<V> recortar(K chaveInicio, K chaveFinal) {
+
+		Lista<V> recorte = new Lista<>();
+
+		if (comparador.compare(chaveInicio, chaveFinal) > 0) {
+			K aux = chaveInicio;
+			chaveInicio = chaveFinal;
+			chaveFinal = aux;
+		}
+
+		recortar(this.raiz, chaveInicio, chaveFinal, recorte);
+		return recorte;
+	}
+
+	private void recortar(No<K, V> raizArvore, K chaveInicio, K chaveFinal, Lista<V> recorte) {
+
+		int comparacaoInicio, comparacaoFinal;
+
+		if (raizArvore != null) {
+			comparacaoInicio = comparador.compare(chaveInicio, raizArvore.getChave());
+			comparacaoFinal = comparador.compare(chaveFinal, raizArvore.getChave());
+
+			if (comparacaoInicio < 0)
+				recortar(raizArvore.getEsquerda(), chaveInicio, chaveFinal, recorte);
+
+			if ((comparacaoInicio <= 0) && (comparacaoFinal >= 0))
+				recorte.inserir(raizArvore.getItem());
+
+			if (comparacaoFinal > 0)
+				recortar(raizArvore.getDireita(), chaveInicio, chaveFinal, recorte);
 		}
 	}
 
@@ -231,4 +250,3 @@ public class ABB<K, V> implements IMapeamento<K, V>{
 		return (termino - inicio) / 1_000_000.0;
 	}
 }
-
